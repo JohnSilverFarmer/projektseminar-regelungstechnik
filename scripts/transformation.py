@@ -4,12 +4,6 @@ import numpy as np
 
 # Parameters
 AR_DICT = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
-W_WORLD, H_WORLD = 2 * 21.0, 29.7  # size of area marked by inner points of aruco markers in cm
-H_IMG, W_IMG = int(H_WORLD * 50), int(W_WORLD * 50)
-DST_POINTS = np.array([[0, H_IMG],
-                       [0, 0],
-                       [W_IMG, 0],
-                       [W_IMG, H_IMG]], dtype="float32")
 
 
 def _order_detections(ids, corners, image_midpoint):
@@ -26,11 +20,11 @@ def _order_detections(ids, corners, image_midpoint):
     return np.array([ids2point[i] for i in range(4)])
 
 
-def detect_markers_and_compute(img, debug_image=False):
+def detect_markers_and_compute(img, dst_size, debug_image=False):
     """
     Detect aruco markers in an image and computes a transform to transform the image into birds eye view.
     """
-    if img.dim != 2:
+    if img.ndim != 2:
         raise ValueError('Aruco detection requires gray scale images.')
 
     # detect aruco marker
@@ -40,11 +34,17 @@ def detect_markers_and_compute(img, debug_image=False):
 
     # compute point correspondences
     ordered_detections = _order_detections(ids, corners, np.float32([img.shape[0] / 2, img.shape[1] / 2]))
-    M = cv2.getPerspectiveTransform(ordered_detections, DST_POINTS)
+
+    h_img, w_img = dst_size
+    dst_points = np.array([[0, h_img],
+                           [0, 0],
+                           [w_img, 0],
+                           [w_img, h_img]], dtype="float32")
+    M = cv2.getPerspectiveTransform(ordered_detections, dst_points)
 
     # return a debug image if requested
     if debug_image:
-        img_debug = cv2.cvt_color(img, cv2.GRAY2BGR)
+        img_debug = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
         frame_markers = cv2.aruco.drawDetectedMarkers(img_debug, corners, ids)
         frame_markers = cv2.aruco.drawDetectedMarkers(frame_markers, rejected_img_points, borderColor=(100, 0, 240))
         return M, frame_markers

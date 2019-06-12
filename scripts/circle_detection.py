@@ -9,18 +9,41 @@ class Circle:
         self.r = r
 
 
+# hough circle parameters
+BLUR_SIZE = (5, 5)
+MIN_DIST = 10
+PARAM1 = 100
+PARAM2 = 15
+MIN_RADIUS = 0
+
+# if the median of a set of pixels is smaller then this value the set of pixels is considered filled
+FILLED_THRES = 120
+
+
 def detect_circles(img, max_radius, reject_empty):
-    circles = cv2.HoughCircles(cv2.GaussianBlur(img, (5, 5), 2.), cv2.HOUGH_GRADIENT, 1.,
-                               minDist=10, param1=100, param2=15,
-                               minRadius=0, maxRadius=max_radius)[0]
+    """
+    Detects circles in an image. Uses the hough circle algorithm to find circles.
+    Adds an option to test whether a circle is filled or not.
+    """
+    if img.ndim != 2:
+        raise ValueError('Circle detection requires gray scale images.')
+
+    circles = cv2.HoughCircles(cv2.GaussianBlur(img, BLUR_SIZE, 2.),
+                               cv2.HOUGH_GRADIENT, 1.,
+                               minDist=MIN_DIST,
+                               param1=PARAM1,
+                               param2=PARAM2,
+                               minRadius=MIN_RADIUS,
+                               maxRadius=max_radius)[0]
 
     detected_circles = []
     for x, y, r in circles.astype(np.int):
+        # get pixels inside the circle
         Y, X = np.ogrid[:img.shape[0], :img.shape[1]]
         mask = np.sqrt((X - x) ** 2 + (Y - y) ** 2) <= r
 
-        # only accept circles that are mostly filled with black
-        if np.median(img[mask]) < 120 or not reject_empty:
+        # if required only accept circles that are mostly filled
+        if np.median(img[mask]) < FILLED_THRES or not reject_empty:
             detected_circles.append(Circle(x, y, r))
 
     return detected_circles

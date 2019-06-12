@@ -9,16 +9,20 @@ class TextBox:
         self.y = y
         self.w = w
         self.h = h
+        self.mid_x = int(x + w / 2.0)
+        self.mid_y = int(y + h / 2.0)
 
 
 def detect_boxes(img):
-    # https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality
-    #  4     Assume a single column of text of variable sizes.
-    #  6     Assume a single uniform block of text.
-    #  11    Sparse text. Find as much text as possible in no particular order.
+    """
+    Detects boxes of text in an image. The actual detection is done via tesseract.
+    For more information on parameters and configuration see:
+    https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality
+    """
+    # using the legacy engine requires downloading train data from
+    # https://github.com/tesseract-ocr/tessdata
     data = pytesseract.image_to_data(img, config='-c tessedit_char_whitelist=0123456789 --psm 6 --oem 0',
                                      output_type=Output.DICT)
-    h, w, _ = img.shape
 
     boxes = []
     n_boxes = len(data['level'])
@@ -27,3 +31,5 @@ def detect_boxes(img):
         if text != u'' and text != u'0':
             (x, y, w, h) = (data['left'][i], data['top'][i], data['width'][i], data['height'][i])
             boxes.append(TextBox(text, x, y, w, h))
+
+    return boxes
