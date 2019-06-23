@@ -10,6 +10,7 @@ from circle2text_matching import match
 from color_detection import detect_text_color
 
 
+
 def draw_result(img, circles, text_boxes, mnz_points):
     _img = img.copy()
 
@@ -26,7 +27,16 @@ def draw_result(img, circles, text_boxes, mnz_points):
         if idx != len(mnz_points) - 1:
             p1 = mnz_point
             p2 = mnz_points[idx + 1]
-            cv2.line(_img, (p1.circle.x, p1.circle.y), (p2.circle.x, p2.circle.y), (255, 0, 0))
+            line_color = None
+            if mnz_point.color_id == 0:
+                line_color = None
+            elif mnz_point.color_id == 1:
+                line_color = (255, 0, 0)
+            elif mnz_point.color_id == 2:
+                line_color = (0, 0, 255)
+
+            if line_color is not None:
+                cv2.line(_img, (p1.circle.x, p1.circle.y), (p2.circle.x, p2.circle.y), line_color)
 
     return _img
 
