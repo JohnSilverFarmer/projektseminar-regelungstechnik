@@ -10,7 +10,6 @@ from circle2text_matching import match
 from color_detection import detect_text_color
 
 
-
 def draw_result(img, circles, text_boxes, mnz_points):
     _img = img.copy()
 
@@ -36,7 +35,7 @@ def draw_result(img, circles, text_boxes, mnz_points):
                 line_color = (0, 0, 255)
 
             if line_color is not None:
-                cv2.line(_img, (p1.circle.x, p1.circle.y), (p2.circle.x, p2.circle.y), line_color)
+                cv2.line(_img, (p1.circle.x, p1.circle.y), (p2.circle.x, p2.circle.y), line_color, 2)
 
     return _img
 
@@ -47,10 +46,10 @@ def imshow(imgs, figsize=(12.5, 10), **kwargs):
     """
     if not isinstance(imgs, list): imgs = [imgs]
     cols = int(np.ceil(np.sqrt(len(imgs))))
-    rows = cols-1 if (cols*cols-len(imgs)== cols) else cols
+    rows = cols - 1 if (cols * cols - len(imgs) == cols) else cols
     fig, axs = plt.subplots(rows, cols, figsize=figsize, squeeze=False)
     for img, ax in zip(imgs, axs.flatten()):
-        cm, sl = ('gray', np.s_[:, :]) if img.ndim == 2 else (None, np.s_[...,::-1])
+        cm, sl = ('gray', np.s_[:, :]) if img.ndim == 2 else (None, np.s_[..., ::-1])
         ax.imshow(img[sl], cmap=cm, **kwargs)
     for ax in axs.flatten(): ax.axis('off')
     plt.tight_layout()
@@ -72,7 +71,7 @@ def main(args):
     img_warped_gs = cv2.warpPerspective(img_gs, m, (w_img, h_img))
 
     # detect circles and text
-    circles = detect_circles(img_warped_gs, w_img//200, reject_empty=True)
+    circles = detect_circles(img_warped_gs, w_img // 200, reject_empty=True)
     text_boxes = detect_boxes(img_warped_gs)
 
     # find corresponding points and text

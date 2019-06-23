@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def check_for_color(img, lower_color, upper_color):
     color_exists = False
 
@@ -12,13 +13,14 @@ def check_for_color(img, lower_color, upper_color):
 
     return color_exists
 
+
 def detect_text_color(img, mnz_point):
     if not img.ndim == 3:
         raise ValueError('Color detection requires a color image as input.')
 
     # get the textbox subframe as roi
     t = mnz_point.textBox
-    roi = img[t.y:t.y+t.h, t.x:t.x+t.w]
+    roi = img[t.y:t.y + t.h, t.x:t.x + t.w]
     hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
     # define range of blue color in HSV
     lower_blue = np.array([100, 10, 10])

@@ -10,7 +10,7 @@ class MalenNachZahlenPunkt:
 
     def __str__(self):
         return '(Number: ' + str(self.num_id) + ' Color: ' + str(self.color_id) + ' x: ' + str(
-            self.circle.x) + ' y: ' + str(self.circle.y)
+            self.circle.x) + ' y: ' + str(self.circle.y) + ')'
 
 
 def match(circles, text_boxes):
