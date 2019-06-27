@@ -1,17 +1,16 @@
 import cv2
 import numpy as np
+import collections
 
 
-def check_for_color(img, lower_color, upper_color):
+def get_pixel_count(img, lower_color, upper_color):
     color_exists = False
 
     # Threshold the HSV image to get only defined colors
     mask = cv2.inRange(img, lower_color, upper_color)
-    color_contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
-    if len(color_contours) > 0:
-        color_exists = True
+    n = np.count_nonzero(mask)
 
-    return color_exists
+    return n
 
 
 def detect_text_color(img, mnz_point):
@@ -32,9 +31,20 @@ def detect_text_color(img, mnz_point):
     lower_red_2 = np.array([160, 50, 50])
     upper_red_2 = np.array([179, 255, 255])
 
-    if check_for_color(hsv, lower_blue, upper_blue):
-        mnz_point.color_id = 1
-    elif check_for_color(hsv, lower_red_1, upper_red_1) or check_for_color(hsv, lower_red_2, upper_red_2):
-        mnz_point.color_id = 2
-    else:
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([180, 255, 70])
+
+
+    n_blue = get_pixel_count(hsv, lower_blue, upper_blue)
+
+    n_red = get_pixel_count(hsv, lower_red_1, upper_red_1)
+    n_red += get_pixel_count(hsv, lower_red_2, upper_red_2)
+
+    n_black = get_pixel_count(hsv, lower_black, upper_black)
+
+    if n_blue == 0 and n_red == 0:
         mnz_point.color_id = 0
+    elif n_blue > n_red:
+        mnz_point.color_id = 1
+    else:
+        mnz_point.color_id = 2

@@ -17,25 +17,26 @@ def draw_result(img, circles, text_boxes, mnz_points):
         raise ValueError('Result should be drawn into a color image.')
 
     for c in circles:
-        cv2.circle(_img, (c.x, c.y), c.r, (0, 0, 255), 4)
-    for t in text_boxes:
-        cv2.putText(_img, t.text, (t.x + t.w, t.y), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
-        cv2.rectangle(_img, (t.x, t.y), (t.x + t.w, t.y + t.h), (0, 255, 0), 4)
+        cv2.circle(_img, (c.x, c.y), c.r, (0, 255, 0), 4)
 
     for idx, mnz_point in enumerate(mnz_points):
+        color = None
+        if mnz_point.color_id == 0:
+            color = (0, 0, 0)
+        elif mnz_point.color_id == 1:
+            color = (255, 0, 0)
+        elif mnz_point.color_id == 2:
+            color = (0, 0, 255)
+
+        t = mnz_point.textBox
+        cv2.putText(_img, t.text, (t.x + t.w, t.y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 2, cv2.LINE_AA)
+        cv2.rectangle(_img, (t.x, t.y), (t.x + t.w, t.y + t.h), color, 4)
+
         if idx != len(mnz_points) - 1:
             p1 = mnz_point
             p2 = mnz_points[idx + 1]
-            line_color = None
-            if mnz_point.color_id == 0:
-                line_color = None
-            elif mnz_point.color_id == 1:
-                line_color = (255, 0, 0)
-            elif mnz_point.color_id == 2:
-                line_color = (0, 0, 255)
-
-            if line_color is not None:
-                cv2.line(_img, (p1.circle.x, p1.circle.y), (p2.circle.x, p2.circle.y), line_color, 2)
+            if not (color == (0, 0, 0)):
+                cv2.line(_img, (p1.circle.x, p1.circle.y), (p2.circle.x, p2.circle.y), color, 2)
 
     return _img
 
