@@ -57,9 +57,9 @@ def imshow(imgs, figsize=(12.5, 10), **kwargs):
     plt.tight_layout()
 
 
-def main(args):
+def main(img_file, output_file, debug):
     # read the input image
-    img = cv2.imread(args.image)
+    img = cv2.imread(img_file)
     img_gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     w_world, h_world = 2 * 21.0, 29.7  # size of area marked by inner points of aruco markers in cm
@@ -83,10 +83,10 @@ def main(args):
     for mnz_point in mnz_points:
         detect_text_color(img_warped, mnz_point)
 
-    if args.debug:
+    if debug:
         result_img = draw_result(img_warped, circles, text_boxes, mnz_points)
         imshow([debug_img_marker, result_img])
-        plt.savefig(str(Path.home()/'Desktop'/'{}-debug.png'.format(Path(args.image).name)), dpi=400)
+        plt.savefig(str(Path(output_file).parent/'{}-debug.png'.format(Path(img_file).name)), dpi=400)
 
     # TODO: export detections as a csv file
 
@@ -98,4 +98,4 @@ if __name__ == '__main__':
     parser.add_argument('--debug', help='Show debug information after execution.', action='store_true')
 
     args = parser.parse_args()
-    main(args)
+    main(args.image, args.outFile, args.debug)
