@@ -2,6 +2,7 @@ import argparse
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 from transformation import detect_markers_and_compute
 from circle_detection import detect_circles
@@ -61,7 +62,7 @@ def main(args):
     img_gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     w_world, h_world = 2 * 21.0, 29.7  # size of area marked by inner points of aruco markers in cm
-    world2img_scale = 50.  # scale factor for transforming cm to pixels in the birds eye image
+    world2img_scale = 75.  # scale factor for transforming cm to pixels in the birds eye image
     h_img, w_img = int(h_world * world2img_scale), int(w_world * world2img_scale)
 
     m, debug_img_marker = detect_markers_and_compute(img_gs, (h_img, w_img), debug_image=True)
@@ -84,7 +85,7 @@ def main(args):
     if args.debug:
         result_img = draw_result(img_warped, circles, text_boxes, mnz_points)
         imshow([debug_img_marker, result_img])
-        plt.show()
+        plt.savefig(str(Path.home()/'Desktop'/'{}-debug.png'.format(Path(args.image).name)), dpi=400)
 
     # TODO: export detections as a csv file
 
