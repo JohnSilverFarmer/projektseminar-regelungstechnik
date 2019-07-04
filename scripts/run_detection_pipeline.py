@@ -56,7 +56,6 @@ def imshow(imgs, figsize=(12.5, 10), **kwargs):
     for ax in axs.flatten(): ax.axis('off')
     plt.tight_layout()
 
-
 def main(img_file, output_file, debug):
     # read the input image
     img = cv2.imread(img_file)
@@ -85,7 +84,7 @@ def main(img_file, output_file, debug):
 
     if debug:
         result_img = draw_result(img_warped, circles, text_boxes, mnz_points)
-        imshow([debug_img_marker, result_img])
+        imshow([result_img])
         plt.savefig(str(Path(output_file).parent/'{}-debug.png'.format(Path(img_file).name)), dpi=400)
 
     # TODO: export detections as a csv file

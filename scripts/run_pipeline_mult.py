@@ -6,7 +6,7 @@ import time
 def main():
     data_dir = Path('../data/test-images').absolute()
     image_paths = [str(data_dir/'test-color-{}.jpg'.format(i)) for i in range(1, 11)]
-    out_file = Path.home()/'Desktop'/'test'/'out.csv'  # provides the dir for debug images
+    out_file = Path('../data/csv-files').absolute()
 
     print('Running the detection pipeline on {} images.'.format(len(image_paths)))
 
