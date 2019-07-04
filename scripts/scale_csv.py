@@ -27,8 +27,8 @@ def main():
     y = []
     c = []
     for row in data:
-        x.append(str(1.15 * float(row[0])))
-        y.append(str(1.15 * float(row[1])))
+        x.append(str(0.42-1 * float(row[0])))
+        y.append(str(1 * float(row[1])))
         c.append(row[2])
 
     np.savetxt("../data/csv-files/PointSetIATScaled.csv", np.column_stack((x, y, c)), delimiter=",", fmt='%s')

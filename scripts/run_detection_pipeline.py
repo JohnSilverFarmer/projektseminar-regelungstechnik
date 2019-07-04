@@ -73,7 +73,7 @@ def main(img_file, output_file, debug):
 
     # detect circles and text
     circles = detect_circles(img_warped_gs, w_img // 200, reject_empty=True)
-    text_boxes = detect_boxes(img_warped_gs)
+    text_boxes, debug_img_text = detect_boxes(img_warped_gs, debug)
 
     # find corresponding points and text
     mnz_points = match(circles, text_boxes)
@@ -84,7 +84,7 @@ def main(img_file, output_file, debug):
 
     if debug:
         result_img = draw_result(img_warped, circles, text_boxes, mnz_points)
-        imshow([result_img])
+        imshow([debug_img_text, result_img])
         plt.savefig(str(Path(output_file).parent/'{}-debug.png'.format(Path(img_file).name)), dpi=400)
 
     # TODO: export detections as a csv file

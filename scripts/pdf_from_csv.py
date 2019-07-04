@@ -42,7 +42,7 @@ def main():
         y = int(mnz_pt.circle.y * MM_TO_PIXEL_SCALE)
         r = int(mnz_pt.circle.r * MM_TO_PIXEL_SCALE)
         cv2.circle(img, (x, y), r, (0, 0, 0), -1)
-        for angle in range(30, 390, 30):
+        for angle in range(10, 390, 30):
             # Try to put text where no text is yet
             x_add, y_add = rotate(DISTANCE_TEXT_POINT_MM * MM_TO_PIXEL_SCALE, angle)
             x_t_center = x - x_add

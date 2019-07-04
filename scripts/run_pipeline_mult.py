@@ -11,7 +11,8 @@ def main():
     print('Running the detection pipeline on {} images.'.format(len(image_paths)))
 
     t0 = time.time()
-    for image_path in image_paths:
+    for id, image_path in enumerate(image_paths):
+        print('Running detection number: {}.'.format(id))
         run_detection_pipeline.main(image_path, out_file, debug=True)
     dt = time.time() - t0
 
