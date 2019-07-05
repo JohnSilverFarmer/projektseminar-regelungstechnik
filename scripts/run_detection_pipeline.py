@@ -11,7 +11,7 @@ from circle2text_matching import match
 from color_detection import detect_text_color
 
 
-def draw_result(img, circles, text_boxes, mnz_points):
+def draw_result(img, circles, mnz_points):
     _img = img.copy()
 
     if not _img.ndim == 3:
@@ -25,7 +25,7 @@ def draw_result(img, circles, text_boxes, mnz_points):
         if mnz_point.color_id == 0:
             color = (0, 0, 0)
         elif mnz_point.color_id == 1:
-            color = (255, 0, 0)
+            color = (0, 255, 0)
         elif mnz_point.color_id == 2:
             color = (0, 0, 255)
 
@@ -56,10 +56,16 @@ def imshow(imgs, figsize=(12.5, 10), **kwargs):
     for ax in axs.flatten(): ax.axis('off')
     plt.tight_layout()
 
+
 def main(img_file, output_file, debug):
     # read the input image
     img = cv2.imread(img_file)
     img_gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    wb = cv2.xphoto.createGrayworldWB()
+    wb.setSaturationThreshold(0.99)
+    img_wb = wb.balanceWhite(img)
+
 
     w_world, h_world = 2 * 21.0, 29.7  # size of area marked by inner points of aruco markers in cm
     world2img_scale = 75.  # scale factor for transforming cm to pixels in the birds eye image
@@ -70,6 +76,7 @@ def main(img_file, output_file, debug):
     # transform the image into a top down perspective
     img_warped = cv2.warpPerspective(img, m, (w_img, h_img))
     img_warped_gs = cv2.warpPerspective(img_gs, m, (w_img, h_img))
+    img_warped_wb = cv2.warpPerspective(img_wb, m, (w_img, h_img))
 
     # detect circles and text
     circles = detect_circles(img_warped_gs, w_img // 200, reject_empty=True)
@@ -79,12 +86,11 @@ def main(img_file, output_file, debug):
     mnz_points = match(circles, text_boxes)
 
     # detect the text color to determine line styles
-    for mnz_point in mnz_points:
-        detect_text_color(img_warped, mnz_point)
+    detect_text_color(img_warped_wb, mnz_points)
 
     if debug:
-        result_img = draw_result(img_warped, circles, text_boxes, mnz_points)
-        imshow([debug_img_text, result_img])
+        result_img = draw_result(img_warped, circles, mnz_points)
+        imshow([img_warped, img_warped_wb, result_img])
         plt.savefig(str(Path(output_file).parent/'{}-debug.png'.format(Path(img_file).name)), dpi=400)
 
     # TODO: export detections as a csv file
