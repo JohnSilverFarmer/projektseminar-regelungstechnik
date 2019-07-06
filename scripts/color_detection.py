@@ -21,7 +21,7 @@ def detect_text_color(img, mnz_points):
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
         # define range of blue color in HSV
-        lower_green = np.array([40, 20, 20])
+        lower_green = np.array([40, 10, 10])
         upper_green = np.array([79, 255, 255])
 
         lower_red_1 = np.array([0, 50, 50])
@@ -41,7 +41,7 @@ def detect_text_color(img, mnz_points):
         n_black = get_area(hsv, lower_black, upper_black)
 
         if n_black > n_green and n_black > n_red:
-            pt.color_id = 0
+            pt.color_id = 1
         elif n_green > n_red and n_green > n_black:
             pt.color_id = 1
         else:
