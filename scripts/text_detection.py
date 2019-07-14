@@ -62,7 +62,10 @@ def get_boxes_distance(b1, b2):
 
 def detect_single_digit_numbers(img):
     # Retrieving boxes from fount contours
-    im2, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    if cv2.__version__.startswith('4.'):
+        contours = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+    else:
+        im2, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contour_boxes = map(lambda cnt: cv2.boundingRect(cnt), contours)
 
     # Remove boxes that are too big
