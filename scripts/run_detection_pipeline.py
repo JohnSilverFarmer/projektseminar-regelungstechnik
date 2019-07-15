@@ -35,7 +35,7 @@ def draw_result(img, circles, mnz_points):
         if mnz_point.color_id == 0:
             color = (0, 0, 0)
         elif mnz_point.color_id == 1:
-            color = (0, 255, 0)
+            color = (255, 255, 0)
         elif mnz_point.color_id == 2:
             color = (0, 0, 255)
 
@@ -106,7 +106,6 @@ def main(img_file, output_file, debug):
 
     # cut edges
     img_cutted_gs, img_cutted_wb = cut_edges([img_warped_gs, img_warped_wb])
-
 
     # detect circles and text
     thres = cv2.adaptiveThreshold(img_cutted_gs, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 41, 30)
