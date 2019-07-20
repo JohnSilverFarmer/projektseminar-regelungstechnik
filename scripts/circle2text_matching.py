@@ -19,11 +19,6 @@ def match(circles, text_boxes):
     the corresponding circle is the circle who's center is closest to the
     text box center.
     """
-    # First remove all circles overlapping with textboxes
-    for t in text_boxes:
-        for c in circles:
-            if t.x < c.x and t.x+t.w > c.x and t.y < c.y and t.y+t.h > c.y:
-                circles.remove(c)
     recognized_points = []
     for t in text_boxes:
         min_distance = None

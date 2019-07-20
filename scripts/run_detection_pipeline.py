@@ -11,7 +11,6 @@ from text_detection import detect_boxes
 from circle2text_matching import match
 from color_detection import detect_text_color
 
-
 BORDER_FRACTION_TO_CUT = 0.01
 
 W_WORLD, H_WORLD = 420, 297  # size of area marked by inner points of aruco markers in mm
@@ -54,7 +53,7 @@ def draw_result(img, circles, mnz_points):
 
 def imshow(imgs, figsize=(12.5, 10), **kwargs):
     """
-    Utility function for dispalying an array of images.
+    Utility function for displaying an array of images.
     """
     if not isinstance(imgs, list): imgs = [imgs]
     cols = int(np.ceil(np.sqrt(len(imgs))))
@@ -83,7 +82,7 @@ def apply_offsets(circles, mnz_points):
 
 def transform_coord_to_rw(x, y):
     x_world_m = float(x) / (WORLD2IMG_SCALE * 1000.) - 0.020
-    y_world_m = (H_IMG - float(y))/(WORLD2IMG_SCALE * 1000.) - 0.0185
+    y_world_m = (H_IMG - float(y)) / (WORLD2IMG_SCALE * 1000.) - 0.0185
     return x_world_m, y_world_m
 
 
@@ -96,7 +95,6 @@ def main(img_file, output_file, debug):
     wb.setSaturationThreshold(0.99)
     img_wb = wb.balanceWhite(img)
 
-
     m, debug_img_marker = detect_markers_and_compute(img_gs, (H_IMG, W_IMG), debug_image=True)
 
     # transform the image into a top down perspective
@@ -108,8 +106,8 @@ def main(img_file, output_file, debug):
     img_cutted_gs, img_cutted_wb = cut_edges([img_warped_gs, img_warped_wb])
 
     # detect circles and text
+    _, circles, _ = detect_circles(img_cutted_gs)
     thres = cv2.adaptiveThreshold(img_cutted_gs, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 41, 30)
-    circles, debug_img_circle = detect_circles(thres, W_IMG // 200, reject_empty=True, debug=debug)
     text_boxes, debug_img_text = detect_boxes(thres, debug)
 
     # find corresponding points and text
@@ -123,7 +121,7 @@ def main(img_file, output_file, debug):
     if debug:
         result_img = draw_result(img_warped, circles, mnz_points)
         imshow([debug_img_text, result_img])
-        plt.savefig(str(Path(output_file).parent/'../debug-images/{}'.format(Path(img_file).name)), dpi=400)
+        plt.savefig(str(Path(output_file).parent / '../debug-images/{}'.format(Path(img_file).name)), dpi=400)
 
     mnz_points.sort(key=lambda pt: pt.num_id)
     with open(output_file, mode='w') as out:
