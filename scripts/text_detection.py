@@ -115,7 +115,7 @@ def get_text_boxes_from_data(data, x_add=0, y_add=0):
 
 def detect_multi_digit_numbers(img):
     img = cv2.GaussianBlur(img, (5, 5), 1.)
-    data = pytesseract.image_to_data(img, config='-c tessedit_char_whitelist=0123456789 --psm 12 --oem 1',
+    data = pytesseract.image_to_data(img, config='-c tessedit_char_whitelist=0123456789 --psm 11 --oem 1',
                                      output_type=Output.DICT)
     return get_text_boxes_from_data(data)
 

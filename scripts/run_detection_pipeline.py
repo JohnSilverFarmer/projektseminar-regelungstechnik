@@ -110,6 +110,8 @@ def main(img_file, output_file, debug):
     # detect circles and text
     thres = cv2.adaptiveThreshold(img_cutted_gs, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 41, 30)
     circles, debug_img_circle = detect_circles(thres, W_IMG // 200, reject_empty=True, debug=debug)
+    for c in circles:
+        cv2.circle(thres, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
     text_boxes, debug_img_text = detect_boxes(thres, debug)
 
     # find corresponding points and text
