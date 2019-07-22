@@ -22,7 +22,7 @@ def rotate(length, angle):
 
 
 def main():
-    data = csv.reader(open(str(Path('../data/csv-files/PointSetIAT.csv').absolute())), delimiter=',')
+    data = csv.reader(open(str(Path('../data/csv-files/test-iat - 2.csv').absolute())), delimiter=',')
     mnz_points = []
     for idx, row in enumerate(data):
         color_id = int(row[2])
@@ -82,8 +82,8 @@ def main():
     if failed:
         print('Failed to create, the numbers are packed too dense!')
     else:
-        image.imsave('../data/mnz-vorlagen/iat.pdf', img, dpi=300)
-        image.imsave('../data/mnz-vorlagen/iat.jpg', img, dpi=300)
+        image.imsave('../data/mnz-vorlagen/iat-test.pdf', img, dpi=300)
+        image.imsave('../data/mnz-vorlagen/iat-test.jpg', img, dpi=300)
 
 
 if __name__ == '__main__':

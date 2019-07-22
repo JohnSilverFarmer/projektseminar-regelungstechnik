@@ -31,7 +31,7 @@ def detect_text_color(img, mnz_points):
         upper_red_2 = np.array([179, 255, 255])
 
         lower_black = np.array([0, 0, 0])
-        upper_black = np.array([179, 100, 100])
+        upper_black = np.array([179, 120, 120])
 
         n_blue = get_area(hsv, lower_blue, upper_blue)
 
