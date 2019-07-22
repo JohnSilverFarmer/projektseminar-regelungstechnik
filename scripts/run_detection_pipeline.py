@@ -108,11 +108,12 @@ def main(img_file, output_file, debug):
     img_cutted_gs, img_cutted_wb = cut_edges([img_warped_gs, img_warped_wb])
 
     # detect circles and text
-    thres = cv2.adaptiveThreshold(img_cutted_gs, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 41, 30)
-    circles, debug_img_circle = detect_circles(thres, W_IMG // 200, reject_empty=True, debug=debug)
+    img_text = img_cutted_gs
+    _, circles, debug_img_circle = detect_circles(img_cutted_gs)
     for c in circles:
-        cv2.circle(thres, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
-    text_boxes, debug_img_text = detect_boxes(thres, debug)
+        cv2.circle(img_text, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
+
+    text_boxes, debug_img_text = detect_boxes(img_text, debug)
 
     # find corresponding points and text
     mnz_points = match(circles, text_boxes)

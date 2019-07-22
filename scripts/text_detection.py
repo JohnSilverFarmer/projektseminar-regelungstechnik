@@ -90,7 +90,7 @@ def detect_single_digit_numbers(img):
 #
     #contour_boxes = filter(lambda box: box not in to_remove, contour_boxes)
 
-    detect_img = cv2.GaussianBlur(img, (5, 5), 2.)
+    detect_img = cv2.GaussianBlur(img, (5, 5), 1.)
     # Detect text and create TextBoxes
     text_boxes = []
     for id, (x, y, w, h) in enumerate(contour_boxes):
