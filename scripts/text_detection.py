@@ -62,7 +62,10 @@ def get_boxes_distance(b1, b2):
 
 def detect_single_digit_numbers(img):
     # Retrieving boxes from fount contours
-    im2, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    if cv2.__version__.startswith('4.'):
+        contours = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+    else:
+        im2, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contour_boxes = map(lambda cnt: cv2.boundingRect(cnt), contours)
 
     # Remove boxes that are too big
@@ -75,24 +78,24 @@ def detect_single_digit_numbers(img):
             if smaller in contour_boxes:
                 contour_boxes.remove(smaller)
     # Remove all small boxes
-    contour_boxes = filter(lambda o: o[2] > 8 and o[3] > 8, contour_boxes)
-    # Remove all boxes of multi digit numbers by distance
-    to_remove = []
-    for box, other in itertools.combinations(contour_boxes, 2):
-        h = max(box[3], other[3])
-        dist = get_boxes_distance(box, other)
-        if dist < h:
-            to_remove.append(box)
-            to_remove.append(other)
-
-    contour_boxes = filter(lambda box: box not in to_remove, contour_boxes)
+    #contour_boxes = filter(lambda o: o[2] > 8 and o[3] > 8, contour_boxes)
+    ## Remove all boxes of multi digit numbers by distance
+    #to_remove = []
+    #for box, other in itertools.combinations(contour_boxes, 2):
+    #    h = max(box[3], other[3])
+    #    dist = get_boxes_distance(box, other)
+    #    if dist < h:
+    #        to_remove.append(box)
+    #        to_remove.append(other)
+#
+    #contour_boxes = filter(lambda box: box not in to_remove, contour_boxes)
 
     detect_img = cv2.GaussianBlur(img, (5, 5), 2.)
     # Detect text and create TextBoxes
     text_boxes = []
     for id, (x, y, w, h) in enumerate(contour_boxes):
         roi = detect_img[y:y+h, x:x+h]
-        data = pytesseract.image_to_data(roi, config='-c tessedit_char_whitelist=123456789 --psm 10 --oem 0',
+        data = pytesseract.image_to_data(roi, config='-l digits --psm 6 --oem 1',
                                          output_type=Output.DICT)
         text_boxes += get_text_boxes_from_data(data, x, y)
 
@@ -115,7 +118,7 @@ def get_text_boxes_from_data(data, x_add=0, y_add=0):
 
 def detect_multi_digit_numbers(img):
     img = cv2.GaussianBlur(img, (5, 5), 1.)
-    data = pytesseract.image_to_data(img, config='-c tessedit_char_whitelist=0123456789 --psm 11 --oem 1',
+    data = pytesseract.image_to_data(img, config='-l digits --psm 11 --oem 1',
                                      output_type=Output.DICT)
     return get_text_boxes_from_data(data)
 
@@ -131,8 +134,15 @@ def detect_boxes(img, debug):
     """
 
     # detect text boxes
-    text_boxes = detect_single_digit_numbers(img)
-    text_boxes += detect_multi_digit_numbers(img)
+    thres = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 41, 30)
+    text_boxes = detect_multi_digit_numbers(thres)
+
+    # now erase multi-digit numbers for single-digit number detection
+    single_digits = thres
+    for box in text_boxes:
+        cv2.rectangle(single_digits, (box.x, box.y), (box.x + box.w, box.y + box.h), (255, 255, 255), -1)
+    text_boxes += detect_single_digit_numbers(thres)
+    #text_boxes += detect_multi_digit_numbers(thres)
 
     # delete duplicates by confidence
     to_remove = []
@@ -143,6 +153,6 @@ def detect_boxes(img, debug):
     text_boxes = filter(lambda box: box not in to_remove, text_boxes)
 
     if debug:
-        return text_boxes, img
+        return text_boxes, single_digits
     else:
         return text_boxes
