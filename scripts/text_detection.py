@@ -6,12 +6,13 @@ import itertools
 
 
 class TextBox:
-    def __init__(self, text, x, y, w, h, conf):
+    def __init__(self, text, x=0, y=0, w=0, h=0, conf=0, color_id=0):
         self.text = text
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+        self.color_id = color_id
         self.set_mid_points()
         self.conf = conf
 

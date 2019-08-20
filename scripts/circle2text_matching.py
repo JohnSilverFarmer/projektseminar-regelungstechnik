@@ -2,14 +2,13 @@ import numpy as np
 
 
 class MalenNachZahlenPunkt:
-    def __init__(self, num_id, color_id, circle, text_box):
+    def __init__(self, num_id, circle, text_box):
         self.num_id = num_id
-        self.color_id = color_id
         self.circle = circle
         self.textBox = text_box
 
     def __str__(self):
-        return '(Number: ' + str(self.num_id) + ' Color: ' + str(self.color_id) + ' x: ' + str(
+        return '(Number: ' + str(self.num_id) + ' x: ' + str(
             self.circle.x) + ' y: ' + str(self.circle.y) + ')'
 
 
@@ -28,7 +27,7 @@ def match(circles, text_boxes):
             if min_distance is None or cur_distance < min_distance:
                 min_distance = cur_distance
                 nearest_circle = c
-        recognized_points.append(MalenNachZahlenPunkt(int(t.text), None, nearest_circle, t))
+        recognized_points.append(MalenNachZahlenPunkt(int(t.text), nearest_circle, t))
 
     recognized_points.sort(key=lambda p: p.num_id)
     return recognized_points

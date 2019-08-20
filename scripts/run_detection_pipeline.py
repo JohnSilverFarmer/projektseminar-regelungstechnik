@@ -32,11 +32,11 @@ def draw_result(img, circles, mnz_points):
 
     for idx, mnz_point in enumerate(mnz_points):
         color = None
-        if mnz_point.color_id == 0:
+        if mnz_point.textBox.color_id == 1:
             color = (0, 0, 0)
-        elif mnz_point.color_id == 1:
+        elif mnz_point.textBox.color_id == 2:
             color = (255, 255, 0)
-        elif mnz_point.color_id == 2:
+        elif mnz_point.textBox.color_id == 3:
             color = (0, 0, 255)
 
         t = mnz_point.textBox
@@ -87,6 +87,18 @@ def transform_coord_to_rw(x, y):
     return x_world_m, y_world_m
 
 
+def is_correct(text_boxes, circles):
+    detected_numbers = map(lambda tb: int(tb.text), text_boxes)
+    colors = map(lambda tb: tb.color_id, text_boxes)
+    color_not_detected = any(c_id == 0 for c_id in colors)
+    if max(detected_numbers) < len(detected_numbers) or len(text_boxes) < len(circles) or color_not_detected:
+        result = False
+    else:
+        result = True
+
+    return result
+
+
 def main(img_file, output_file, debug):
     # read the input image
     img = cv2.imread(img_file)
@@ -115,17 +127,22 @@ def main(img_file, output_file, debug):
 
     text_boxes, debug_img_text = detect_boxes(img_text, debug)
 
+    detect_text_color(img_cutted_wb, text_boxes)
+
+    if not is_correct(text_boxes, circles):
+        print('Something is incorrect')
+        # todo gui
+
     # find corresponding points and text
     mnz_points = match(circles, text_boxes)
 
     # detect the text color to determine line styles
-    detect_text_color(img_cutted_wb, mnz_points)
 
     apply_offsets(circles, mnz_points)
 
     if debug:
         result_img = draw_result(img_warped, circles, mnz_points)
-        imshow([debug_img_text, result_img])
+        imshow([debug_img_marker, result_img])
         plt.savefig(str(Path(output_file).parent/'../debug-images/{}'.format(Path(img_file).name)), dpi=400)
 
     mnz_points.sort(key=lambda pt: pt.num_id)
@@ -133,7 +150,7 @@ def main(img_file, output_file, debug):
         out_writer = csv.writer(out, delimiter=',')
         for pt in mnz_points:
             x, y = transform_coord_to_rw(pt.circle.x, pt.circle.y)
-            out_writer.writerow([x, y, pt.color_id])
+            out_writer.writerow([x, y, pt.textBox.color_id - 1])
 
 
 if __name__ == '__main__':

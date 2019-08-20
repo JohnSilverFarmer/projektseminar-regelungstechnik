@@ -5,8 +5,8 @@ import time
 
 def main():
     data_dir = Path('../data/test-images').absolute()
-    image_paths = [str(data_dir/'test-iat - {}.jpg'.format(i)) for i in range(1, 10)]
-    out_files = [str('../data/csv-files/test-iat - {}.csv'.format(j)) for j in range(1, 10)]
+    image_paths = [str(data_dir/'test-hvm - {}.jpg'.format(i)) for i in range(1, 12)]
+    out_files = [str('../data/csv-files/test-hvm - {}.csv'.format(j)) for j in range(1, 12)]
 
     print('Running the detection pipeline on {} images.'.format(len(image_paths)))
 

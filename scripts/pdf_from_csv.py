@@ -1,5 +1,6 @@
 import csv
 from circle2text_matching import MalenNachZahlenPunkt
+from text_detection import TextBox
 from circle_detection import Circle
 import cv2
 import numpy as np
@@ -31,7 +32,7 @@ def main():
         x_mm = float(row[0]) * 1000 + 20
         y_mm = 297 - (float(row[1]) * 1000 + 18.5)
         r_mm = 1.5
-        mnz_points.append(MalenNachZahlenPunkt(idx + 1, color_id, Circle(x_mm, y_mm, r_mm), None))
+        mnz_points.append(MalenNachZahlenPunkt(idx + 1, Circle(x_mm, y_mm, r_mm), TextBox(str(idx + 1), color_id=color_id)))
 
     colors = [(0, 0, 0), (0, 255, 255), (255, 0, 0)]
     text_points = []
@@ -72,7 +73,7 @@ def main():
                 if not failed:
                     text_points.append((x_t_center, y_t_center))
                     cv2.putText(img, str(mnz_pt.num_id), (int(x_t_lb), int(y_t_lb)), cv2.FONT_HERSHEY_PLAIN, 6,
-                                colors[int(mnz_pt.color_id)], 5)
+                                colors[int(mnz_pt.textBox.color_id)], 5)
                     # cv2.circle(img, (int(x_t_center), int(y_t_center)), 5, (0, 0, 0), -1)
                     break
 
