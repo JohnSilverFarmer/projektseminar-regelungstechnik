@@ -31,6 +31,18 @@ def draw_circle(src, pnt):
     cv2.circle(src, (pnt.x, pnt.y), pnt.r, (0, 255, 0), 10)
 
 
+def is_correct(text_boxes, circles):
+    detected_numbers = list(map(lambda tb: int(tb.text), text_boxes))
+    colors = list(map(lambda tb: tb.color_id, text_boxes))
+    color_not_detected = any(c_id == 0 for c_id in colors)
+    if max(detected_numbers) < len(detected_numbers) or len(text_boxes) < len(circles) or color_not_detected:
+        result = False
+    else:
+        result = True
+
+    return result
+
+
 class DetectionEditor(object):
     """ A GUI that enables editing detected points and text on an image. You initialize an editor object
     with your detected circles & text boxes and present it to the user via its show() method.
@@ -46,6 +58,7 @@ class DetectionEditor(object):
         self._current_edit_mode = None
         self._digit_buffer = ''
         self.add_pnt_button, self.add_num_button, self.delete_button, self.change_color_button = None, None, None, None
+        self.exit_button = None
 
     def _update_content(self):
         updated_image = self.base_image.copy()
@@ -80,9 +93,9 @@ class DetectionEditor(object):
         self._update_content()
 
         self.fig.subplots_adjust(bottom=0.15, top=0.92)
-        gs = gridspec.GridSpec(1, 4)
+        gs = gridspec.GridSpec(1, 5)
         gs.update(left=0.2, right=0.8, bottom=0.05, top=0.1, hspace=0.0)
-        axes = [self.fig.add_subplot(gs[i, j]) for i, j in [[0, 0], [0, 1], [0, 2], [0, 3]]]
+        axes = [self.fig.add_subplot(gs[i, j]) for i, j in [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]]]
 
         # create editor buttons
         self.add_pnt_button = wdg.Button(axes[0], 'Add Point')
@@ -96,6 +109,9 @@ class DetectionEditor(object):
 
         self.change_color_button = wdg.Button(axes[3], 'Change Color')
         self.change_color_button.on_clicked(self._on_change_color_click)
+
+        self.exit_button = wdg.Button(axes[4], 'Save & Exit')
+        self.exit_button.on_clicked(self._on_exit_click)
 
         cid = self.fig.canvas.mpl_connect('button_press_event', self._on_canvas_click)
         cid = self.fig.canvas.mpl_connect('key_press_event', self._on_key_press)
@@ -205,6 +221,13 @@ class DetectionEditor(object):
         edt = self._current_edit_mode != 'color'
         self._current_edit_mode = 'color' if edt else None
         self._disp_mode()
+
+    def _on_exit_click(self, event):
+        if is_correct(self.boxes, self.circles):
+            plt.close(self.fig)
+        else:
+            self.fig.suptitle('Detections don\'t meet specification!', fontsize=16)
+            self.fig.canvas.draw_idle()
 
     def show(self):
         self.fig, self.ax = plt.subplots(figsize=(8, 6))

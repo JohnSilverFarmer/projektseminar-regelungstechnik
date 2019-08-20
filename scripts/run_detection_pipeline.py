@@ -10,7 +10,7 @@ from circle_detection import detect_circles
 from text_detection import detect_boxes
 from circle2text_matching import match
 from color_detection import detect_text_color
-from detection_editor import DetectionEditor
+from detection_editor import DetectionEditor, is_correct
 
 
 BORDER_FRACTION_TO_CUT = 0.01
@@ -86,18 +86,6 @@ def transform_coord_to_rw(x, y):
     x_world_m = float(x) / (WORLD2IMG_SCALE * 1000.) - 0.020
     y_world_m = (H_IMG - float(y))/(WORLD2IMG_SCALE * 1000.) - 0.0185
     return x_world_m, y_world_m
-
-
-def is_correct(text_boxes, circles):
-    detected_numbers = list(map(lambda tb: int(tb.text), text_boxes))
-    colors = list(map(lambda tb: tb.color_id, text_boxes))
-    color_not_detected = any(c_id == 0 for c_id in colors)
-    if max(detected_numbers) < len(detected_numbers) or len(text_boxes) < len(circles) or color_not_detected:
-        result = False
-    else:
-        result = True
-
-    return result
 
 
 def main(img_file, output_file, debug):
