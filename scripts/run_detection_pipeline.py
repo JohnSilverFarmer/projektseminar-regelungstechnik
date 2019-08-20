@@ -10,6 +10,7 @@ from circle_detection import detect_circles
 from text_detection import detect_boxes
 from circle2text_matching import match
 from color_detection import detect_text_color
+from detection_editor import DetectionEditor
 
 
 BORDER_FRACTION_TO_CUT = 0.01
@@ -88,8 +89,8 @@ def transform_coord_to_rw(x, y):
 
 
 def is_correct(text_boxes, circles):
-    detected_numbers = map(lambda tb: int(tb.text), text_boxes)
-    colors = map(lambda tb: tb.color_id, text_boxes)
+    detected_numbers = list(map(lambda tb: int(tb.text), text_boxes))
+    colors = list(map(lambda tb: tb.color_id, text_boxes))
     color_not_detected = any(c_id == 0 for c_id in colors)
     if max(detected_numbers) < len(detected_numbers) or len(text_boxes) < len(circles) or color_not_detected:
         result = False
@@ -107,7 +108,6 @@ def main(img_file, output_file, debug):
     wb = cv2.xphoto.createGrayworldWB()
     wb.setSaturationThreshold(0.99)
     img_wb = wb.balanceWhite(img)
-
 
     m, debug_img_marker = detect_markers_and_compute(img_gs, (H_IMG, W_IMG), debug_image=True)
 
@@ -127,16 +127,15 @@ def main(img_file, output_file, debug):
 
     text_boxes, debug_img_text = detect_boxes(img_text, debug)
 
+    # detect the text color to determine line styles
     detect_text_color(img_cutted_wb, text_boxes)
 
     if not is_correct(text_boxes, circles):
-        print('Something is incorrect')
-        # todo gui
+        editor = DetectionEditor(img_cutted_wb, circles, text_boxes)
+        editor.show()
 
     # find corresponding points and text
     mnz_points = match(circles, text_boxes)
-
-    # detect the text color to determine line styles
 
     apply_offsets(circles, mnz_points)
 

@@ -63,7 +63,7 @@ def remove_duplicate_texts(text_boxes):
             to_remove.append(box) if box.conf < other.conf else to_remove.append(other)
 
     cleaned = filter(lambda box: box not in to_remove, text_boxes)
-    return cleaned
+    return list(cleaned)
 
 
 def detect_boxes(img, debug):
