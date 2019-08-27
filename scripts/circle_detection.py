@@ -43,7 +43,7 @@ def to_circle(contour, max_radius=300):
     """ Create a circle, i.e. center and radius, from a single
     contour. Optionally filters large contours. """
     r = cv2.boundingRect(contour)[2] // 2
-    if r > max_radius:
+    if r > max_radius or r == 0:
         return None
     m = cv2.moments(contour)
     x, y = int(m['m10'] / m['m00']), int(m['m01'] / m['m00'])

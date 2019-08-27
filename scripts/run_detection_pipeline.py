@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+import pickle
 from pathlib import Path
 
 from transformation import detect_markers_and_compute
@@ -88,8 +89,7 @@ def transform_coord_to_rw(x, y):
     return x_world_m, y_world_m
 
 
-def main(img_file, output_file, debug):
-    # read the input image
+def read_img_and_transform(img_file):
     img = cv2.imread(img_file)
     img_gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -107,20 +107,44 @@ def main(img_file, output_file, debug):
     # cut edges
     img_cutted_gs, img_cutted_wb = cut_edges([img_warped_gs, img_warped_wb])
 
+    return img_cutted_gs, img_cutted_wb, img_warped_wb
+
+
+def detect_everything(img_cutted_gs, img_cutted_wb, debug):
+    # read the input image
     # detect circles and text
     img_text = img_cutted_gs
     _, circles, debug_img_circle = detect_circles(img_cutted_gs)
     for c in circles:
         cv2.circle(img_text, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
 
-    text_boxes, debug_img_text = detect_boxes(img_text, debug)
+    if debug:
+        text_boxes, debug_img_text = detect_boxes(img_text, debug)
+    else:
+        text_boxes = detect_boxes(img_text, debug)
 
     # detect the text color to determine line styles
-    detect_text_color(img_cutted_wb, text_boxes)
+    if debug:
+        debug_img_color = detect_text_color(img_cutted_wb, text_boxes, debug)
+    else:
+        detect_text_color(img_cutted_wb, text_boxes, debug)
+
+    return text_boxes, circles
+
+
+def main(img_file, output_file, debug):
+    img_cutted_gs, img_cutted_wb, img_warped_wb = read_img_and_transform(img_file)
+    text_boxes, circles = detect_everything(img_cutted_gs, img_cutted_wb, debug)
+
+
+    with open('/Users/eugenrogulenko/Desktop/groundTruth.pkl', mode='w') as out:
+        pickle.dump((text_boxes, circles), out)
 
     if not is_correct(text_boxes, circles):
         editor = DetectionEditor(img_cutted_wb, circles, text_boxes)
         editor.show()
+
+
 
     # find corresponding points and text
     mnz_points = match(circles, text_boxes)
@@ -128,9 +152,13 @@ def main(img_file, output_file, debug):
     apply_offsets(circles, mnz_points)
 
     if debug:
-        result_img = draw_result(img_warped, circles, mnz_points)
-        imshow([debug_img_marker, result_img])
+        result_img = draw_result(img_warped_wb, circles, mnz_points)
+        imshow([result_img])
+        #imshow([debug_img_text[H_IMG/4*3.2:H_IMG-H_IMG/20, W_IMG/100:W_IMG/5]])
         plt.savefig(str(Path(output_file).parent/'../debug-images/{}'.format(Path(img_file).name)), dpi=400)
+
+
+
 
     mnz_points.sort(key=lambda pt: pt.num_id)
     with open(output_file, mode='w') as out:

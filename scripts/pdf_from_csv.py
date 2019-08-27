@@ -9,6 +9,11 @@ import matplotlib.pyplot as plt
 from matplotlib import image
 import math
 
+
+CIRCLE_RADIUS_MM = 5
+FONT_SCALE = 6
+FONT_THICKNESS = 5
+
 DISTANCE_TEXT_POINT_MM = 10
 MIN_DISTANCE_TEXT_TEXT_MM = 13
 MM_TO_PIXEL_SCALE = 10 * 4961./4200
@@ -23,7 +28,7 @@ def rotate(length, angle):
 
 
 def main():
-    data = csv.reader(open(str(Path('../data/csv-files/test-iat - 2.csv').absolute())), delimiter=',')
+    data = csv.reader(open(str(Path('../data/csv-files/PointSetIAT.csv').absolute())), delimiter=',')
     mnz_points = []
     for idx, row in enumerate(data):
         color_id = int(row[2])
@@ -31,7 +36,7 @@ def main():
         y_m = row[1]
         x_mm = float(row[0]) * 1000 + 20
         y_mm = 297 - (float(row[1]) * 1000 + 18.5)
-        r_mm = 1.5
+        r_mm = CIRCLE_RADIUS_MM
         mnz_points.append(MalenNachZahlenPunkt(idx + 1, Circle(x_mm, y_mm, r_mm), TextBox(str(idx + 1), color_id=color_id)))
 
     colors = [(0, 0, 0), (0, 255, 255), (255, 0, 0)]
@@ -72,8 +77,8 @@ def main():
                             break
                 if not failed:
                     text_points.append((x_t_center, y_t_center))
-                    cv2.putText(img, str(mnz_pt.num_id), (int(x_t_lb), int(y_t_lb)), cv2.FONT_HERSHEY_PLAIN, 6,
-                                colors[int(mnz_pt.textBox.color_id)], 5)
+                    cv2.putText(img, str(mnz_pt.num_id), (int(x_t_lb), int(y_t_lb)), cv2.FONT_HERSHEY_PLAIN, FONT_SCALE,
+                                colors[int(mnz_pt.textBox.color_id)], FONT_THICKNESS)
                     # cv2.circle(img, (int(x_t_center), int(y_t_center)), 5, (0, 0, 0), -1)
                     break
 
@@ -83,8 +88,8 @@ def main():
     if failed:
         print('Failed to create, the numbers are packed too dense!')
     else:
-        image.imsave('../data/mnz-vorlagen/iat-test.pdf', img, dpi=300)
-        image.imsave('../data/mnz-vorlagen/iat-test.jpg', img, dpi=300)
+        image.imsave('../data/mnz-vorlagen/iat-cr-{}.pdf'.format(CIRCLE_RADIUS_MM), img, dpi=300)
+        image.imsave('../data/mnz-vorlagen/iat-cr-{}.jpg'.format(CIRCLE_RADIUS_MM), img, dpi=300)
 
 
 if __name__ == '__main__':

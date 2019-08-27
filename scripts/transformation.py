@@ -14,8 +14,10 @@ def _order_detections(ids, corners, image_midpoint):
     """
     ids2point = {}
     for mid, m_corners in zip(np.squeeze(ids), np.squeeze(corners)):
-        ds = np.sqrt(np.sum((m_corners - image_midpoint) ** 2, axis=1))  # distance of corner points to center of image
-        ids2point[mid] = m_corners[np.argmin(ds)]
+        corner_idx = mid + 1
+        if corner_idx > 3:
+            corner_idx -= 4
+        ids2point[mid] = m_corners[corner_idx]
 
     return np.array([ids2point[i] for i in range(4)])
 
