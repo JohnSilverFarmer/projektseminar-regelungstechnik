@@ -32,7 +32,7 @@ def run_iteration(image_path, gt_text_boxes, gt_circles):
     for t in text_boxes:
         for other in gt_text_boxes:
             if int(t.text) == int(other.text):
-                if abs(t.x - other.x) < 20 and abs(t.y - other.y) < 20:
+                if abs(t.x - other.x) < 30 and abs(t.y - other.y) < 30:
                     correct_tb += 1
                     if t.color_id == other.color_id:
                         correct_color += 1
