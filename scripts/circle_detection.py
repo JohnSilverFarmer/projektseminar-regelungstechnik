@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-ADAPT_THRES_SIZE = 31
+ADAPT_THRES_SIZE = 75
 ADAPT_THRES_C = 10
 BLUR_SIZE = 5
 MORPH_ELLIPSE_SIZE = 7

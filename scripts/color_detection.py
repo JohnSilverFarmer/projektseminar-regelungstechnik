@@ -54,9 +54,6 @@ def detect_text_color(img, text_boxes, debug=False):
 
             n_black = get_area(hsv, lower_black, upper_black, debug)
 
-        if debug and int(t.text) == 47:
-            print('Blue: {}, Red: {}, Black: {}'.format(n_blue, n_red, n_black))
-            debug_img = mask_black
         color_counts = [n_black, n_blue, n_red]
 
         two_colors_detected = False
@@ -74,6 +71,3 @@ def detect_text_color(img, text_boxes, debug=False):
             t.color_id = 3
         else:
             t.color_id = 0
-
-    if debug:
-        return debug_img

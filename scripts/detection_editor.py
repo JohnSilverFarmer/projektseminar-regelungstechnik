@@ -35,12 +35,24 @@ def is_correct(text_boxes, circles):
     detected_numbers = list(map(lambda tb: int(tb.text), text_boxes))
     colors = list(map(lambda tb: tb.color_id, text_boxes))
     color_not_detected = any(c_id == 0 for c_id in colors)
-    if max(detected_numbers) != len(detected_numbers) or len(text_boxes) < len(circles) or color_not_detected:
+    if max(detected_numbers) != len(detected_numbers) or len(text_boxes) < len(circles) or \
+            color_not_detected or len(circles) == 0:
         result = False
     else:
         result = True
 
     return result
+
+
+def _compute_box_circle_dims(boxes, circles):
+    if len(boxes) > 0:
+        box_heigh = int(np.median([b.h for b in boxes]))
+        box_width = int(np.median([b.w // len(b.text) for b in boxes]))
+    else:
+        box_heigh, box_width = 30, 20
+
+    circle_dimension = int(np.median([c.r for c in circles])) if len(circles) != 0 else 4
+    return box_heigh, box_width, circle_dimension
 
 
 class DetectionEditor(object):
@@ -62,8 +74,7 @@ class DetectionEditor(object):
 
         # compute dimensions for new boxes/circles based on median
         # size of already existing boxes
-        self.box_height, self.box_width = int(np.median([b.h for b in boxes])), int(np.median([b.w // len(b.text) for b in boxes]))
-        self.circle_rad = int(np.median([c.r for c in circles]))
+        self.box_height, self.box_width, self.circle_rad = _compute_box_circle_dims(boxes, circles)
 
     def _update_content(self):
         updated_image = self.base_image.copy()
