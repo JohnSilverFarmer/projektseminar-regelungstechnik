@@ -60,6 +60,11 @@ class DetectionEditor(object):
         self.add_pnt_button, self.add_num_button, self.delete_button, self.change_color_button = None, None, None, None
         self.exit_button = None
 
+        # compute dimensions for new boxes/circles based on median
+        # size of already existing boxes
+        self.box_height, self.box_width = int(np.median([b.h for b in boxes])), int(np.median([b.w // len(b.text) for b in boxes]))
+        self.circle_rad = int(np.median([c.r for c in circles]))
+
     def _update_content(self):
         updated_image = self.base_image.copy()
 
@@ -159,7 +164,7 @@ class DetectionEditor(object):
             if closest is not None:
                 elem, dist, is_num = closest
 
-                if dist <= 10:
+                if dist <= 15:
                     if is_num:
                         self.boxes.remove(elem)
                     else:
@@ -169,10 +174,10 @@ class DetectionEditor(object):
             # place the entered text on the image
             text = self._digit_buffer
             if text != '':
-                width = len(text) * 20
-                height = 30
-                box = TextBox(x=click_loc[0] - width // 2, y=click_loc[1] - height // 2, text=text, w=width,
-                              h=30, color_id=0)
+                width = len(text) * self.box_width
+                height = self.box_height
+                box = TextBox(x=click_loc[0] - width // 2, y=click_loc[1] - height // 2, text=text,
+                              w=width, h=height, color_id=0)
                 self.boxes.append(box)
 
                 # reset digit buffer
@@ -182,7 +187,7 @@ class DetectionEditor(object):
                 did_make_a_change = True
         elif self._current_edit_mode == 'point':
             # add a point at the clicked location
-            self.circles.append(Circle(x=click_loc[0], y=click_loc[1], r=4))
+            self.circles.append(Circle(x=click_loc[0], y=click_loc[1], r=self.circle_rad))
             did_make_a_change = True
         elif self._current_edit_mode == 'color':
             closest = self._find_closest(click_loc)

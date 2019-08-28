@@ -137,8 +137,8 @@ def main(img_file, output_file, debug):
     text_boxes, circles = detect_everything(img_cutted_gs, img_cutted_wb, debug)
 
 
-    with open('/Users/eugenrogulenko/Desktop/groundTruth.pkl', mode='w') as out:
-        pickle.dump((text_boxes, circles), out)
+    # with open('/Users/eugenrogulenko/Desktop/groundTruth.pkl', mode='w') as out:
+    #     pickle.dump((text_boxes, circles), out)
 
     if not is_correct(text_boxes, circles):
         editor = DetectionEditor(img_cutted_wb, circles, text_boxes)
