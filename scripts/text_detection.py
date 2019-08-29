@@ -66,7 +66,7 @@ def remove_duplicate_texts(text_boxes):
     return list(cleaned)
 
 
-def detect_boxes(img, debug):
+def detect_boxes(img, do_backup_detection=False, debug=False):
     """
     Detects boxes of text in an image. The actual detection is done via tesseract.
     For more information on parameters and configuration see:
@@ -82,12 +82,13 @@ def detect_boxes(img, debug):
     text_boxes = detect_multi_digit_numbers(thres)
 
     text_boxes = remove_duplicate_texts(text_boxes)
-    # now erase detected numbers for backup detection of the rest
-    for box in text_boxes:
-        cv2.rectangle(thres, (box.x - 2, box.y - 2), (box.x + box.w + 2, box.y + box.h + 2), (255, 255, 255), -1)
-    text_boxes += backup_detection(thres)
+    if do_backup_detection:
+        # now erase detected numbers for backup detection of the rest
+        for box in text_boxes:
+            cv2.rectangle(thres, (box.x - 2, box.y - 2), (box.x + box.w + 2, box.y + box.h + 2), (255, 255, 255), -1)
+        text_boxes += backup_detection(thres)
 
-    text_boxes = remove_duplicate_texts(text_boxes)
+        text_boxes = remove_duplicate_texts(text_boxes)
 
     if debug:
         return text_boxes, thres

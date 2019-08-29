@@ -119,9 +119,9 @@ def detect_everything(img_cutted_gs, img_cutted_wb, debug):
         cv2.circle(img_text, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
 
     if debug:
-        text_boxes, debug_img_text = detect_boxes(img_text, debug)
+        text_boxes, debug_img_text = detect_boxes(img_text, False, debug)
     else:
-        text_boxes = detect_boxes(img_text, debug)
+        text_boxes = detect_boxes(img_text, False, debug)
 
     # detect the text color to determine line styles
     detect_text_color(img_cutted_wb, text_boxes, debug)
