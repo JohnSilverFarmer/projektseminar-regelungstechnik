@@ -110,18 +110,24 @@ def read_img_and_transform(img_file):
     return img_cutted_gs, img_cutted_wb, img_warped_wb
 
 
-def detect_everything(img_cutted_gs, img_cutted_wb, debug):
-    # read the input image
-    # detect circles and text
-    img_text = img_cutted_gs
-    _, circles, debug_img_circle = detect_circles(img_cutted_gs)
+def detect_everything(img_cutted_gs, img_cutted_wb, debug, do_double_text_detect=True, do_circle_detection=True):
+
+    # allow to switch of circle detection e.g. while performing evaluations
+    # when an image does not contain any circles
+    if do_circle_detection:
+        _, circles, _ = detect_circles(img_cutted_gs.copy())
+    else:
+        circles = []
+
+    # remove detected circles from the image to avoid interference with the text detection algorithm
+    text_detector_input = img_cutted_gs.copy()
     for c in circles:
-        cv2.circle(img_text, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
+        cv2.circle(text_detector_input, (c.x, c.y), int(c.r * 2), (255, 255, 255), -1)
 
     if debug:
-        text_boxes, debug_img_text = detect_boxes(img_text, False, debug)
+        text_boxes, debug_img_text = detect_boxes(text_detector_input, do_double_text_detect, debug)
     else:
-        text_boxes = detect_boxes(img_text, False, debug)
+        text_boxes = detect_boxes(text_detector_input, do_double_text_detect, debug)
 
     # detect the text color to determine line styles
     detect_text_color(img_cutted_wb, text_boxes, debug)
@@ -137,8 +143,9 @@ def main(img_file, output_file, debug):
         editor = DetectionEditor(img_cutted_wb, circles, text_boxes)
         editor.show()
 
-    ground_truth_dir = Path('../data/test-images/ground-truth')
-    grd_file_path = ground_truth_dir.joinpath(Path(img_file).stem).with_suffix('.pkl')
+    # the following code can be used to dump the resulting detections to a file (as ground truth for evaluation)
+    # ground_truth_dir = Path('../data/test-images/ground-truth')
+    # grd_file_path = ground_truth_dir.joinpath(Path(img_file).stem).with_suffix('.pkl')
     # with open(grd_file_path.resolve(), mode='wb') as out:
     #     pickle.dump((text_boxes, circles), out)
 

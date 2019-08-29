@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import numpy as np
 
 
@@ -14,6 +16,9 @@ def read_results(path):
         results.append(dict(zip(names, vals)))
 
     return results
+
+
+__AggregatedStats = namedtuple('AggregatedStats', 'parameter metric_mean metric_std')
 
 
 def compute_aggregated_stats(ags):
@@ -35,4 +40,4 @@ def compute_aggregated_stats(ags):
     params = np.asarray(params)[sort_indices]
     metric_means = np.asarray(metric_means)[sort_indices]
     metric_stds = np.asarray(metric_stds)[sort_indices]
-    return params, metric_means, metric_stds
+    return __AggregatedStats(params, metric_means, metric_stds)

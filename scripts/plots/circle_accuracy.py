@@ -36,7 +36,7 @@ def _aggregate_results(results, fixed_font):
 def main():
     results = read_results(Path(RESULT_FILE))
 
-    fig, axs = plt.subplots(ncols=2, sharey=True, figsize=(0.8*8.27, 3))
+    fig, axs = plt.subplots(ncols=2, sharey=True, figsize=(0.7*8.27, 3))
 
     ags = _aggregate_results(results, fixed_font=5)
     font_scales, accs_means, accs_stds = compute_aggregated_stats(ags)
