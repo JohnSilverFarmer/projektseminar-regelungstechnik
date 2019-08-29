@@ -139,8 +139,8 @@ def main(img_file, output_file, debug):
 
     ground_truth_dir = Path('../data/test-images/ground-truth')
     grd_file_path = ground_truth_dir.joinpath(Path(img_file).stem).with_suffix('.pkl')
-    with open(grd_file_path.resolve(), mode='wb') as out:
-        pickle.dump((text_boxes, circles), out)
+    # with open(grd_file_path.resolve(), mode='wb') as out:
+    #     pickle.dump((text_boxes, circles), out)
 
     # find corresponding points and text
     mnz_points = match(circles, text_boxes)
