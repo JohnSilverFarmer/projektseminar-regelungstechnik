@@ -6,7 +6,7 @@ import numpy as np
 AR_DICT = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
 
 
-def _order_detections(ids, corners, image_midpoint):
+def _order_detections(ids, corners):
     """
     For each detected corner the point closest to the image center is computed.
     The resulting points are ordered according to there corresponding id in
@@ -18,6 +18,12 @@ def _order_detections(ids, corners, image_midpoint):
         if corner_idx > 3:
             corner_idx -= 4
         ids2point[mid] = m_corners[corner_idx]
+
+    # check if all four markers have been detected
+    num_detected = len(ids2point.keys())
+    if num_detected != 4:
+        raise ValueError('Four markers are required but only {} were detected. Ensure that ArUco markers are not '
+                         'occluded by other objects in the scene.'.format(num_detected))
 
     return np.array([ids2point[i] for i in range(4)])
 
@@ -35,7 +41,7 @@ def detect_markers_and_compute(img, dst_size, debug_image=False):
     corners, ids, rejected_img_points = cv2.aruco.detectMarkers(img, AR_DICT, parameters=parameters)
 
     # compute point correspondences
-    ordered_detections = _order_detections(ids, corners, np.float32([img.shape[0] / 2, img.shape[1] / 2]))
+    ordered_detections = _order_detections(ids, corners)
 
     h_img, w_img = dst_size
     dst_points = np.array([[0, h_img],
